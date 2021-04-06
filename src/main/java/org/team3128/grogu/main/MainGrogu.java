@@ -1,5 +1,25 @@
+/*
+    Garrison:
+    I'm using this file as the main entry point for lots of comments.
+    Most of what I suggest is probably simple refactoring.
+    There might be a couple of structural changes that I recommend, also.
+    There may be comments in other files that can easily be found in the changelog. 
+
+    My philosophy for code is that it should be READABLE, first and foremost. 
+    This is hard to define but basically it boils down to anyone being able to 
+    read and understand your code easily. They should not have to become familiar 
+    with too much of the underlying interfaces to understand what is going on.
+    Basically a random developer should be able to read and understand the code
+    within an hour or two and be able to modify or implement logic.
+*/
+
+
 package org.team3128.grogu.main;
 
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 
@@ -10,43 +30,82 @@ import com.kauailabs.navx.frc.AHRS;
 
 import org.team3128.common.NarwhalRobot;
 import org.team3128.common.control.trajectory.Trajectory;
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import org.team3128.common.control.trajectory.TrajectoryGenerator;
 import org.team3128.common.control.trajectory.constraint.TrajectoryConstraint;
 import org.team3128.common.drive.DriveCommandRunning;
 import org.team3128.common.hardware.limelight.LEDMode;
 import org.team3128.common.hardware.limelight.Limelight;
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import org.team3128.common.hardware.gyroscope.NavX;
 import org.team3128.common.utility.units.Angle;
 import org.team3128.common.utility.units.Length;
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import org.team3128.common.vision.CmdHorizontalOffsetFeedbackDrive;
 import org.team3128.common.utility.Log;
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import org.team3128.common.utility.RobotMath;
 import org.team3128.common.utility.datatypes.PIDConstants;
 import org.team3128.common.narwhaldashboard.NarwhalDashboard;
 import org.team3128.common.listener.ListenerManager;
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import org.team3128.common.listener.POVValue;
 import org.team3128.common.listener.controllers.ControllerExtreme3D;
 import org.team3128.common.listener.controltypes.Button;
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import org.team3128.common.listener.controltypes.POV;
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
 import org.team3128.common.utility.math.Pose2D;
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.common.utility.test_suite.CanDevices;
 import org.team3128.common.utility.test_suite.ErrorCatcherUtility;
 import org.team3128.grogu.subsystems.*;
 import org.team3128.grogu.commands.*;
-
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.networktables.NetworkTable;
+/*
+    Garrison: 
+    Remove unused imports that clutter the code.
+*/
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import edu.wpi.first.networktables.NetworkTable;
@@ -60,6 +119,14 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 public class MainGrogu extends NarwhalRobot {
 
+    /*  
+        Garrison:
+        This needs to be refactored. 
+        A class should DO something. 
+        This either needs to be a struct or should just be a 
+        boolean as there is only one boolean value stored in 
+        the class. 
+    */
     private DriveCommandRunning driveCmdRunning;
 
     // public StateTracker stateTracker = StateTracker.getInstance();
@@ -67,28 +134,71 @@ public class MainGrogu extends NarwhalRobot {
  
     // RobotTracker robotTracker = RobotTracker.getInstance();
 
+    /*
+        Garrison: 
+        What does this do?
+        It has no references.
+    */
     ExecutorService executor = Executors.newFixedThreadPool(6);
     CommandScheduler scheduler = CommandScheduler.getInstance();
+    /*
+        Garrison: 
+        This also has no references. 
+    */
     Thread auto;
 
     public Joystick joystickRight, joystickLeft;
     public ListenerManager listenerLeft, listenerRight;
+    /*
+        Garrison: 
+        Recommend naming this ahrsGyro so it is clear what it is.
+    */
     public AHRS ahrs;
+    /*
+        Garrison: 
+        Why is this static?
+        It also has no references...
+        Perhaps stuff that is on every robot should be setup automatically?
+    */
     public static PowerDistributionPanel pdp;
 
+    /*  
+        Garrison:
+        These also have no references but I assume they were used last year.
+        I would suggest better names to more easily identify what they are.
+        limelightNetworkTable, for example.
+    */
     public NetworkTable table;
     public NetworkTable limelightTable;
 
+    /*  
+        Garrison:
+        No references on this one...
+    */
     public double startTime = 0;
 
+    /*  
+        Garrison:
+        This should have a better name. 
+        Also probably not the best way to do this but convenient if you are changing often.
+    */
     public int reverse = 1;
 
+    /*  
+        Garrison:
+        None of these have references.
+        Removing these will help with code clarity.
+    */
     public String trackerCSV = "Time, X, Y, Theta, Xdes, Ydes";
-
     public ArrayList<Pose2D> waypoints = new ArrayList<Pose2D>();
     public Trajectory trajectory;
 
     public Limelight shooterLimelight, ballLimelight;
+    /*  
+        Garrison:
+        The naming on these is bad...
+        Also not referenced...
+    */
     public boolean inPlace = false;
     public boolean inPlace2 = false;
 
@@ -105,7 +215,8 @@ public class MainGrogu extends NarwhalRobot {
         //shooterLimelight.setLEDMode(LEDMode.OFF);
         //ballLimelight.setLEDMode(LEDMode.OFF);
         
-        driveCmdRunning = new DriveCommandRunning();
+        
+        driveCmdRunning = new DriveCommandRunning(); 
 
         ahrs = drive.ahrs;
 
@@ -127,6 +238,17 @@ public class MainGrogu extends NarwhalRobot {
                 Constants.VisionConstants.BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT, 14.5 * Length.in);
         drive.resetGyro();
 
+        /*
+            Garrison:
+            This should probably be called inside of the hopper class...
+            Seems like a weird requirement for WPILIB to have to register this.
+            Not sure I would have a subsystem that wasn't registered and running periodic updates.
+            I see down below that you are using the listeners to manage logic AND functions of the shooter.
+            This is not great from a decoupling perspective. The functions and logic should be handled in the shooter class.
+            The listeners should simply set flags on the subsystems. Such as shooter.SetState(Shooter.ShooterState.Shooting).
+            The initialization states should also be handled within the class of the subsystem.
+            You're basically doing too much outside of the subsystem which can make it hard to figure out what is going on.
+        */
         hopper.register();
 
         shooter.enable();

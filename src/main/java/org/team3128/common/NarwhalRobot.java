@@ -269,7 +269,14 @@ public abstract class NarwhalRobot extends RobotBase {
             HAL.observeUserProgramDisabled();
             disabledPeriodic();
             m_watchdog.addEpoch("disablePeriodic()");
-        } else if(false) {
+        }
+        /*
+            Garrison:
+            This is dead code. 
+            It will never run.
+            It should be removed.
+        */ 
+        else if(false) {
             if (m_lastMode != Mode.kAutonomous) {
                 autonomousInit();
                 Log.info("NarwhalRobot", "Entered Autonomous");

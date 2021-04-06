@@ -1,6 +1,10 @@
 package org.team3128.grogu.subsystems;
 
 import org.team3128.common.hardware.motor.LazyCANSparkMax;
+/*  
+    Garrison:
+    OMG remove unused imports! 
+*/
 import org.team3128.common.control.RateLimiter;
 import org.team3128.common.control.AsynchronousPid;
 import org.team3128.common.control.motion.RamseteController;
@@ -61,6 +65,16 @@ public class Hopper implements Subsystem {
 
     //TODO: set this boolean to boolean in shooter class 
     private boolean isShooterReady = false;
+
+
+    /*  
+        Garrison:
+        This is an incomplete singleton pattern.
+        Nothing prevents the code from creating multiple instances.
+        I recommend fully implementing the singleton pattern.
+        https://www.journaldev.com/1377/java-singleton-design-pattern-best-practices-examples
+        I prefer #4 in the link above.  
+    */
 
     public static Hopper getInstance() { 
         return instance;
@@ -126,6 +140,12 @@ public class Hopper implements Subsystem {
         //TODO: update this variable
         isShooterReady = (Sidekick.getInstance().isReady() && Shooter.getInstance().isReady());
     }
+
+    /*  
+        Garrison:
+        The logic for increasing or decreasing ball count should be decoupled from the state.
+        I would simply have a method that checks and updates ball count every periodic loop.  
+    */
 
     private void intake() {
         Log.info("hopper","intaking");
