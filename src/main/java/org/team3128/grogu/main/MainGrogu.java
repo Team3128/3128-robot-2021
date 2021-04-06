@@ -283,6 +283,11 @@ public class MainGrogu extends NarwhalRobot {
         listenerRight.nameControl(new Button(12), "ResetBallCount");
         listenerLeft.nameControl(ControllerExtreme3D.TRIGGER, "REVERSE");
 
+        /*
+            Garrison:
+            All of this logic should be moved into the subsystems.
+        */
+
         listenerRight.addMultiListener(() -> {
             if (driveCmdRunning.isRunning) {
                 double horiz = 0.4  * listenerRight.getAxis("MoveTurn"); //-0.5
@@ -323,6 +328,11 @@ public class MainGrogu extends NarwhalRobot {
             Log.info("Joystick","Button 4 unpressed");
         });
 
+        /*
+            Garrison:
+            These are good. The logic is handled in the susbsystem.
+        */
+
         listenerRight.addButtonDownListener("MoveArmDown", () -> {
             hopper.moveArmDown();
         });
@@ -343,9 +353,19 @@ public class MainGrogu extends NarwhalRobot {
             hopper.resetBallCount();
         });
 
+        /*
+            Garrison:
+            Move logic into subsystem.
+        */
+
         listenerLeft.addButtonDownListener("REVERSE", () -> {
             reverse *= -1;
         });
+
+        /*
+            Garrison:
+            This is good, we are setting states but not handling the logic.
+        */
 
         listenerRight.addButtonDownListener("SetOverYonder", () -> {
             shooter.setState(Shooter.ShooterState.LONG_RANGE);
@@ -362,6 +382,12 @@ public class MainGrogu extends NarwhalRobot {
     @Override
     protected void teleopPeriodic() {
     }
+
+
+    /*
+        Garrison:
+        These should be moved into the updateDashboard method as they are not used outside of it.
+    */
 
     double maxLeftSpeed = 0;
     double maxRightSpeed = 0;
@@ -395,6 +421,12 @@ public class MainGrogu extends NarwhalRobot {
 
     @Override
     protected void teleopInit() {
+        /*
+            Garrison:
+            I would move this logic into the shooter.
+            You may have multiple things that need to be initialized 
+            for the shooter and it is best done there.
+        */
         shooterLimelight.setLEDMode(LEDMode.OFF);
         Log.info("MainGrogu", "TeleopInit has started. Setting arm state to ArmState.STARTING");
         driveCmdRunning.isRunning = true;
@@ -402,12 +434,22 @@ public class MainGrogu extends NarwhalRobot {
 
     @Override
     protected void autonomousInit() {
+        /*
+            Garrison:
+            Again, I would handle this in the drive "subsystem".
+            something like drive.autonomousInit().
+            Might have this for every subsystem.
+            Perhaps a list of Subsystem objects and call an Init funciton on all of them.
+        */
         drive.resetGyro();
-
     }
 
     @Override
     protected void disabledInit() {
+        /*
+            Garrison: 
+            Move to shooter subsystem.
+        */
         shooterLimelight.setLEDMode(LEDMode.OFF);
     }
 
