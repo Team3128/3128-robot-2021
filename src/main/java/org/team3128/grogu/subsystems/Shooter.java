@@ -2,6 +2,7 @@ package org.team3128.grogu.subsystems;
 
 import org.team3128.common.utility.Log;
 import org.team3128.common.utility.test_suite.CanDevices;
+import org.team3128.sim.Robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -17,8 +18,20 @@ import org.team3128.common.hardware.motor.LazyVictorSPX;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.PIDSubsystem;
+import edu.wpi.first.wpiutil.math.VecBuilder;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
+import com.ctre.phoenix.motorcontrol.can.BaseTalon;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 
 
 public class Shooter extends PIDSubsystem {
@@ -41,8 +54,12 @@ public class Shooter extends PIDSubsystem {
     }
 
     public static final Shooter instance = new Shooter();
-    public static LazyTalonFX LEFT_SHOOTER;
-    public static LazyTalonFX RIGHT_SHOOTER;
+    public static BaseTalon LEFT_SHOOTER;
+    public static BaseTalon RIGHT_SHOOTER;
+    public static TalonSRXSimCollection LEFT_SHOOTERSim;
+    public static TalonSRXSimCollection RIGHT_SHOOTERSim;
+
+    public static DifferentialDrivetrainSim driveSim;
 
     public static boolean DEBUG = true;
     double current = 0;
@@ -80,10 +97,27 @@ public class Shooter extends PIDSubsystem {
     }
 
     private void configMotors() {
-        LEFT_SHOOTER = new LazyTalonFX(Constants.ShooterConstants.SHOOTER_MOTOR_LEFT_ID);
-        RIGHT_SHOOTER = new LazyTalonFX(Constants.ShooterConstants.SHOOTER_MOTOR_RIGHT_ID);
-        if (DEBUG) {
-            Log.info("Shooter", "Config motors");
+        if(Robot.isReal()){
+            LEFT_SHOOTER = new LazyTalonFX(Constants.ShooterConstants.SHOOTER_MOTOR_LEFT_ID);
+            RIGHT_SHOOTER = new LazyTalonFX(Constants.ShooterConstants.SHOOTER_MOTOR_RIGHT_ID);
+            if (DEBUG) {
+                Log.info("Shooter", "Config motors");
+            }
+        }else{
+            LEFT_SHOOTER = new TalonSRX(Constants.ShooterConstants.SHOOTER_MOTOR_LEFT_ID);
+            RIGHT_SHOOTER = new TalonSRX(Constants.ShooterConstants.SHOOTER_MOTOR_RIGHT_ID);
+            LEFT_SHOOTERSim = ((TalonSRX)LEFT_SHOOTER).getSimCollection();
+            RIGHT_SHOOTERSim = ((TalonSRX)RIGHT_SHOOTER).getSimCollection();
+
+            driveSim = new DifferentialDrivetrainSim(
+                DCMotor.getFalcon500(2), 
+                0, 
+                0, 
+                0, 
+                0, 
+                0,
+                VecBuilder.fill(0,0,0.0001,0.1,0.1,0.005,0.005)
+            );
         }
     }
 
@@ -175,11 +209,30 @@ public class Shooter extends PIDSubsystem {
         setSetpoint(0);
     }
 
-    //@Override
-    //public void periodic() {
-        //Log.info("Shooter", "running periodic");
-       
-    //}
+    @Override
+    public void simulationPeriodic() {
+        Log.info("Shooter", "running sim periodic");
+        
+        driveSim.setInputs(LEFT_SHOOTER.getMotorOutputVoltage(), RIGHT_SHOOTER.getMotorOutputVoltage());
+        driveSim.update(0.02);
+
+        System.out.println("herepog");
+        System.out.println(
+            (int)driveSim.getLeftPositionMeters() + " " +
+            LEFT_SHOOTER.getMotorOutputVoltage() + " " +
+            RobotController.getBatteryVoltage()
+        );
+
+        LEFT_SHOOTERSim.setQuadratureRawPosition((int)driveSim.getLeftPositionMeters());
+        LEFT_SHOOTERSim.setQuadratureVelocity((int)driveSim.getLeftVelocityMetersPerSecond());
+        RIGHT_SHOOTERSim.setQuadratureRawPosition((int)driveSim.getRightPositionMeters());
+        RIGHT_SHOOTERSim.setQuadratureVelocity((int)driveSim.getRightVelocityMetersPerSecond());
+
+        LEFT_SHOOTERSim.setBusVoltage(RobotController.getBatteryVoltage());
+        RIGHT_SHOOTERSim.setBusVoltage(RobotController.getBatteryVoltage());
+    }
+
+
 
     public double shooterFeedForward(double desiredSetpoint) {
         //double ff = (0.00211 * desiredSetpoint) - 2; // 0.051

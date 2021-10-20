@@ -39,14 +39,14 @@ public class CmdWheelbaseTest extends SequentialCommandGroup {
             double s;
             double wheelbase1;
             double wheelbase2;
-            int leftPos = drive.getLeftMotors().getSelectedSensorPosition();
-            int rightPos = drive.getRightMotors().getSelectedSensorPosition();
+            int leftPos = (int)drive.getLeftMotors().getSelectedSensorPosition();
+            int rightPos = (int)drive.getRightMotors().getSelectedSensorPosition();
             double theta = Double.valueOf(ahrs.getYaw());
             addCommands(drive.new CmdArcTurn(large_turn_radius, angle, Direction.LEFT, 1, 10000).withTimeout(10));
             theta = ahrs.getYaw() - theta;
             theta = theta * (Math.PI / 180);
-            leftPos = drive.getLeftMotors().getSelectedSensorPosition() - leftPos;
-            rightPos = drive.getRightMotors().getSelectedSensorPosition() - rightPos;
+            leftPos = (int)drive.getLeftMotors().getSelectedSensorPosition() - leftPos;
+            rightPos = (int)drive.getRightMotors().getSelectedSensorPosition() - rightPos;
 
             s = 0.5 * (Double.valueOf(leftPos + rightPos));
 
