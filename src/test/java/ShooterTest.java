@@ -49,13 +49,7 @@ public class ShooterTest {
 
       shooter.useOutput(pidOutput, setpoint);
       Mockito.verify(LEFT_SHOOTER).set(ControlMode.PercentOutput, percentage);
-      Mockito.verify(RIGHT_SHOOTER).set(ControlMode.PercentOutput, percentage);
-
-        //Output 0
-
-        //Extraneous Output > 1
-        //Extraneous Output < -1
-        //Random Output
+      Mockito.verify(RIGHT_SHOOTER).set(ControlMode.PercentOutput, -percentage);
     }
 
     @Test
@@ -69,7 +63,7 @@ public class ShooterTest {
 
       shooter.useOutput(pidOutput, setpoint);
       Mockito.verify(LEFT_SHOOTER).set(ControlMode.PercentOutput, percentage);
-      Mockito.verify(RIGHT_SHOOTER).set(ControlMode.PercentOutput, percentage);
+      Mockito.verify(RIGHT_SHOOTER).set(ControlMode.PercentOutput, -percentage);
     }
 
     @Test
@@ -83,6 +77,6 @@ public class ShooterTest {
 
       shooter.useOutput(pidOutput, setpoint);
       Mockito.verify(LEFT_SHOOTER).set(ControlMode.PercentOutput, percentage);
-      Mockito.verify(RIGHT_SHOOTER).set(ControlMode.PercentOutput, percentage);
+      Mockito.verify(RIGHT_SHOOTER).set(ControlMode.PercentOutput, -percentage);
     }
 }
