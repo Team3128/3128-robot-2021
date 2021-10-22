@@ -5,15 +5,9 @@ import org.team3128.common.utility.test_suite.CanDevices;
 import org.team3128.sim.Robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-//import org.team3128.testbench.subsystems.Constants;
-import org.team3128.common.hardware.motor.LazyCANSparkMax;
 import org.team3128.common.hardware.motor.LazyTalonFX;
-import org.team3128.common.hardware.motor.LazyTalonSRX;
-import org.team3128.common.hardware.motor.LazyVictorSPX;
+import org.team3128.common.utility.Log;
 
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -38,7 +32,7 @@ public class Shooter extends PIDSubsystem {
     public enum ShooterState {
         OFF(0),
         LONG_RANGE(5500), // long range shooting
-        MID_RANGE(2000), //4800 actual setpoint  // mid range shooting
+        MID_RANGE(4800), //4800 actual setpoint  // mid range shooting
         SHORT_RANGE(3500),
         GREEN(1200),
         YELLOW(5000),
@@ -72,6 +66,7 @@ public class Shooter extends PIDSubsystem {
     double value = 0, preValue = 0, time = 0, preTime = 0;
 
     int plateauCount = 0;
+    private double thresholdPercent = Constants.ShooterConstants.RPM_THRESHOLD_PERCENT;
 
     // private StateTracker stateTracker = StateTracker.getInstance();
     public ShooterState SHOOTER_STATE = ShooterState.MID_RANGE;
@@ -79,13 +74,13 @@ public class Shooter extends PIDSubsystem {
     private Shooter() {
 
         super(new PIDController(Constants.ShooterConstants.SHOOTER_PID.kP, Constants.ShooterConstants.SHOOTER_PID.kI, Constants.ShooterConstants.SHOOTER_PID.kD));
-        getController().setTolerance(Constants.ShooterConstants.RPM_THRESHOLD);
+        getController().setTolerance(thresholdPercent * 4800);
         //.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
-
+        
 
         configMotors();
         configEncoders();
-        setSetpoint(0);
+        preTime = RobotController.getFPGATime()/ 1e6;
     }
 
     public boolean atSetpoint() {
@@ -149,12 +144,15 @@ public class Shooter extends PIDSubsystem {
 
         value = getMeasurement();
         time = RobotController.getFPGATime() / 1e6;
+        if (thresholdPercent < Constants.ShooterConstants.RPM_THRESHOLD_PERCENT_MAX) {
+            thresholdPercent += ((time - preTime) * ((Constants.ShooterConstants.RPM_THRESHOLD_PERCENT_MAX - Constants.ShooterConstants.RPM_THRESHOLD_PERCENT)) / Constants.ShooterConstants.TIME_TO_MAX_THRESHOLD);
+        }
         
         double accel = (value - preValue) / (time - preTime);
 
-        Log.info("Shooter",getMeasurement()+" RPM");
+        // Log.info("Shooter",getMeasurement()+" RPM");
 
-        if ((Math.abs(value - preValue) <= Constants.ShooterConstants.RPM_PLATEAU_THRESHOLD) &&(Math.abs(value - setpoint) <= Constants.ShooterConstants.RPM_THRESHOLD) && (setpoint != 0)) {
+        if (atSetpoint() && (setpoint != 0)) {
             plateauCount++;
         } else {
             plateauCount = 0;
@@ -190,11 +188,23 @@ public class Shooter extends PIDSubsystem {
         RIGHT_SHOOTER.set(ControlMode.PercentOutput, -output);
     }
 
-    /*public void setSetpoint(double passedSetpoint) {
+    // overriding PIDController setSetpoint() to set the tolerance as well
+    // public void setSetpoint(double passedSetpoint) {
+    //     plateauCount = 0;
+    //     super.setSetpoint(passedSetpoint);
+    //     getController().setTolerance(thresholdPercent * passedSetpoint);
+    //     //Log.info("Shooter", "Set setpoint to" + String.valueOf(setpoint));
+    // }
+
+    public void setSetpointAndTolerance(double passedSetpoint) {
         plateauCount = 0;
         super.setSetpoint(passedSetpoint);
+        getController().setTolerance(thresholdPercent * passedSetpoint);
         //Log.info("Shooter", "Set setpoint to" + String.valueOf(setpoint));
-    }*/
+    }
+
+
+
 
     public void setState(ShooterState shooterState) {
         SHOOTER_STATE = shooterState;
@@ -202,7 +212,7 @@ public class Shooter extends PIDSubsystem {
     }
 
     public void shoot() {
-        setSetpoint(SHOOTER_STATE.shooterRPM);
+        setSetpointAndTolerance(SHOOTER_STATE.shooterRPM);
     }
 
     public void counterShoot() {
@@ -266,6 +276,6 @@ public class Shooter extends PIDSubsystem {
             Log.info("Shooter","at Setpoint");
         if (isAligned)
             Log.info("Shooter","is Aligned");
-        return ((isAligned || SHOOTER_STATE == ShooterState.GREEN) && isPlateaued())
+        return ((isAligned || SHOOTER_STATE == ShooterState.GREEN) && isPlateaued());
     }
 }

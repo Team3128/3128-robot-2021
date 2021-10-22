@@ -3,39 +3,26 @@
  */
 package org.team3128.grogu.subsystems;
 
-import org.team3128.common.hardware.motor.LazyCANSparkMax;
-import org.team3128.common.control.RateLimiter;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.kauailabs.navx.frc.AHRS;
+
 import org.team3128.common.control.AsynchronousPid;
+import org.team3128.common.control.RateLimiter;
 import org.team3128.common.control.motion.RamseteController;
 import org.team3128.common.control.trajectory.Trajectory;
-import org.team3128.common.control.trajectory.Trajectory.State;
-import org.team3128.common.drive.AutoDriveSignal;
+import org.team3128.common.drive.Drive;
 import org.team3128.common.drive.DriveSignal;
+import org.team3128.common.hardware.motor.LazyTalonFX;
+import org.team3128.common.utility.Log;
+import org.team3128.common.utility.RobotMath;
 import org.team3128.common.utility.math.Rotation2D;
 import org.team3128.grogu.main.MainGrogu;
-import org.team3128.common.utility.NarwhalUtility;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
-import org.team3128.common.hardware.motor.LazyTalonFX;
-import org.team3128.common.utility.RobotMath;
-
-import edu.wpi.first.wpilibj.Timer;
-
-import com.kauailabs.navx.frc.AHRS;
-
-import org.team3128.common.utility.Log;
-import org.team3128.common.drive.Drive;
-
-
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 
 public class FalconDrive extends Drive {

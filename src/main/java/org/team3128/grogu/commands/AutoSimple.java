@@ -12,10 +12,10 @@ public class AutoSimple extends SequentialCommandGroup {
 
     public AutoSimple(Limelight shooterLimelight, DriveCommandRunning cmdRunning, double goalHorizontalOffset, PathFinding m_robotContainer, FalconDrive mRobotDrive, Hopper hopper) {       
         addCommands(
-            new CmdAlignShoot(shooterLimelight, cmdRunning, goalHorizontalOffset, 3)
-            // new InstantCommand(() -> hopper.runIntake()),
-            // m_robotContainer.getAutonomousCommandSimple(mRobotDrive),
-            // new InstantCommand(() -> hopper.stopIntake())
+            new CmdAlignShoot(shooterLimelight, cmdRunning, goalHorizontalOffset, 3),
+            new InstantCommand(() -> hopper.runIntake()),
+            m_robotContainer.getAutonomousCommandSimple(mRobotDrive),
+            new InstantCommand(() -> hopper.stopIntake())
             );
     }
 }

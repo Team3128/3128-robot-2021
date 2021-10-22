@@ -112,11 +112,15 @@ public class Constants extends RobotConstants {
                 public static final double BOTTOM_LIMELIGHT_ANGLE = 30.0 * Angle.DEGREES;
                 public static final double BOTTOM_LIMELIGHT_DISTANCE_FROM_FRONT = 1 * Length.in;
                 public static final int SAMPLE_RATE = 3;
-                public static final double TX_THRESHOLD = 5; // the maximum error in tx where the shooter will be allowed to shoot
+                public static final double TX_THRESHOLD = 2; // the maximum error in tx where the shooter will be allowed to shoot
+                public static final double TX_THRESHOLD_MAX = 5;
+                public static final double TIME_TO_MAX_THRESHOLD = 5;
+
                 public static final double TX_OFFSET = 0; // to offset alignment in either direction
                 public static final PIDConstants VISION_PID = new PIDConstants(0, 0.01, 0.02, 0.00006);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
+                public static final double AUTO_ALIGN_TIMEOUT = 10; // seconds to wait before canceling 
         }
 
 
@@ -152,12 +156,16 @@ public class Constants extends RobotConstants {
                 // new 2
                 public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 16e-6, 5e-6, 4.20e-6);
                 
-                public static final PIDConstants SIDEKICK_PID = new PIDConstants(0, 0, 0, 0);
+                public static final PIDConstants SIDEKICK_PID = new PIDConstants(0, 1e-6, 0, 0);
 
                 public static final double SHOOTER_SATURATION_LIMIT = 5; // set limit on integral accumulation (in this case, 1 volt)
-                public static final double RPM_THRESHOLD = 200; // the maximum difference between an RPM and  the setpoint for a data point to be considered as a plataeu
-                public static final double RPM_PLATEAU_THRESHOLD = 100; // the maximum difference between an RPM and  the setpoint for a data point to be considered as a plataeu
+                // public static final double RPM_THRESHOLD = 200; // the maximum difference between an RPM and  the setpoint for a data point to be considered as a plataeu
+                public static final double RPM_THRESHOLD_PERCENT = 0.05;
+                // public static final double RPM_PLATEAU_THRESHOLD = 100; // the maximum difference between an RPM and  the setpoint for a data point to be considered as a plataeu
+                public static final double RPM_PLATEAU_PERCENT = 0.02;
                 public static final int PLATEAU_COUNT = 25; // 50 * 0.005s = 0.25 seconds of plateau required
+                public static final double RPM_THRESHOLD_PERCENT_MAX = 0.1;
+                public static final double TIME_TO_MAX_THRESHOLD = 5;
 
                 public static final int CAN_TIMEOUT = 10;
         }
@@ -177,6 +185,9 @@ public class Constants extends RobotConstants {
                 public static final int ARM_MOTOR_ID = 7;
                 public static final int BRUSH_MOTOR_ID = 5;
                 public static final int INTAKE_MOTOR_ID = 4;
+
+                public static final int TOP_LIMIT_SWITCH_ID = 0;
+                public static final int BOTTOM_LIMIT_SWITCH_ID = 1;
 
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
 

@@ -1,24 +1,14 @@
 package org.team3128.grogu.subsystems;
 
-import org.team3128.common.utility.Log;
-import org.team3128.common.utility.test_suite.CanDevices;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import org.team3128.grogu.subsystems.Constants;
-import org.team3128.common.hardware.motor.LazyCANSparkMax;
-import org.team3128.common.hardware.motor.LazyTalonFX;
 import org.team3128.common.hardware.motor.LazyTalonSRX;
-import org.team3128.common.hardware.motor.LazyVictorSPX;
+import org.team3128.common.utility.Log;
 
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 
 
 public class Sidekick extends PIDSubsystem {
@@ -26,7 +16,7 @@ public class Sidekick extends PIDSubsystem {
         OFF(0),
         LONG_RANGE(4800), // long range shooting
         MID_RANGE(4080), // actual setpoint 4080 // mid range shooting
-        DEFAULT(-5100), // actual default -5100
+        DEFAULT(-2000), // actual default -5100
         SHORT_RANGE(2000); // short range shooting 3700
 
         public double shooterRPM;
@@ -55,7 +45,7 @@ public class Sidekick extends PIDSubsystem {
     private Sidekick() {
 
         super(new PIDController(Constants.ShooterConstants.SIDEKICK_PID.kP, Constants.ShooterConstants.SIDEKICK_PID.kI, Constants.ShooterConstants.SIDEKICK_PID.kD));
-        getController().setTolerance(Constants.ShooterConstants.RPM_THRESHOLD);
+        getController().setTolerance(2000*Constants.ShooterConstants.RPM_THRESHOLD_PERCENT);
         //.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
 
 
@@ -115,11 +105,11 @@ public class Sidekick extends PIDSubsystem {
 
         //Log.info("Shooter", "using output");
 
-        Log.info("Sidekick",getMeasurement()+" RPM");
+        // Log.info("Sidekick",getMeasurement()+" RPM");
 
         prevError = error;
 
-        if ((Math.abs(value - preValue) <= Constants.ShooterConstants.RPM_PLATEAU_THRESHOLD) && (setpoint != 0)) {
+        if ((Math.abs(value - preValue) <= Constants.ShooterConstants.RPM_PLATEAU_PERCENT * -setpoint) && /*(Math.abs(value - setpoint) <= Constants.ShooterConstants.RPM_THRESHOLD_PERCENT * setpoint) && */(setpoint != 0)) {
             plateauCount++;
         } else {
             plateauCount = 0;
@@ -165,7 +155,7 @@ public class Sidekick extends PIDSubsystem {
 
     public double shooterFeedForward(double desiredSetpoint) {
         //double ff = (0.00211 * desiredSetpoint) - 2; // 0.051
-        double ff = (0.002 * desiredSetpoint); //0.3//0.00147x - 0.2; // 0
+        double ff = (0.0024 * desiredSetpoint); //0.3//0.00147x - 0.2; // 0
         if (getSetpoint() != 0) {
             return ff;
         } else {
@@ -186,8 +176,8 @@ public class Sidekick extends PIDSubsystem {
     // }
 
     public boolean isReady() {
-        if (atSetpoint())
-            Log.info("Sidekick","at Setpoint");
+        // if (atSetpoint())
+            // Log.info("Sidekick","at Setpoint");
         return (isPlateaued());
         //return true;
     }

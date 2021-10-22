@@ -1,38 +1,30 @@
 package org.team3128.grogu.commands;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.team3128.common.drive.DriveCommandRunning;
 import org.team3128.common.drive.DriveSignal;
 import org.team3128.common.hardware.limelight.LEDMode;
-import org.team3128.common.hardware.limelight.Pipeline;
 import org.team3128.common.hardware.limelight.Limelight;
 import org.team3128.common.hardware.limelight.LimelightData;
 import org.team3128.common.hardware.limelight.LimelightKey;
-import org.team3128.common.hardware.limelight.StreamMode;
-import org.team3128.common.hardware.gyroscope.Gyro;
 import org.team3128.common.narwhaldashboard.NarwhalDashboard;
 import org.team3128.common.utility.Log;
 import org.team3128.common.utility.RobotMath;
 import org.team3128.common.utility.datatypes.PIDConstants;
-import org.team3128.common.utility.units.Angle;
+import org.team3128.grogu.subsystems.Constants;
+import org.team3128.grogu.subsystems.FalconDrive;
+import org.team3128.grogu.subsystems.StateTracker;
 
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj2.command.Command; 
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import org.team3128.grogu.subsystems.*;
-
-import com.kauailabs.navx.frc.AHRS;
-
-import java.util.Set;
-import java.util.HashSet;
-
-import org.team3128.grogu.commands.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class CmdAlignShootTeleop implements Command {
     FalconDrive drive;
-    Shooter shooter;
-    Hopper hopper;
+    StateTracker stateTracker;
     boolean gotDistance = false;
 
 
@@ -59,13 +51,13 @@ public class CmdAlignShootTeleop implements Command {
 
     private Set<Subsystem> requirements;
 
-    private Command hopperShoot, organize;
-
     int targetFoundCount;
     int plateauCount;
 
     int numBallsShot;
     int numBallsToShoot;
+
+    private double txThreshold = Constants.VisionConstants.TX_THRESHOLD;
 
     private enum HorizontalOffsetFeedbackDriveState {
         SEARCHING, FEEDBACK; // , BLIND;
@@ -74,14 +66,11 @@ public class CmdAlignShootTeleop implements Command {
     private HorizontalOffsetFeedbackDriveState aimState = HorizontalOffsetFeedbackDriveState.SEARCHING;
 
     public CmdAlignShootTeleop(Limelight limelight, DriveCommandRunning cmdRunning, double goalHorizontalOffset, int numBallsToShoot) {
-        this.shooter = Shooter.getInstance();
-        this.hopper = Hopper.getInstance();
         this.drive = FalconDrive.getInstance();
+        this.stateTracker = StateTracker.getInstance();
 
         this.requirements = new HashSet<Subsystem>();
         this.requirements.add(drive);
-        this.requirements.add(shooter);
-        this.requirements.add(hopper);
         
         this.limelight = limelight;
         this.visionPID = Constants.VisionConstants.VISION_PID;
@@ -91,6 +80,7 @@ public class CmdAlignShootTeleop implements Command {
         this.goalHorizontalOffset = goalHorizontalOffset;
 
         this.numBallsToShoot = numBallsToShoot;
+
     }
 
     @Override
@@ -102,19 +92,21 @@ public class CmdAlignShootTeleop implements Command {
     public void initialize() {
         limelight.setLEDMode(LEDMode.ON);
         cmdRunning.isRunning = false;
+        previousTime = RobotController.getFPGATime() / 1e6;
         plateauCount = 0;
-        // TODO: prob not helpful but sets hopper to shooting
-        //hopper.setAction(Hopper.ActionState.SHOOTING);
+ 
         Log.info("CmdAlignShoot", "initialized limelight, aren't I cool!");
     }
 
     @Override
     public void execute() {
         //Log.info("CmdAlignShoot", "Running one loop of execute");
+        currentTime = RobotController.getFPGATime() / 1e6;
+
         switch (aimState) {
             case SEARCHING:
                 NarwhalDashboard.put("align_status", "searching");
-                Log.info("CmdAlignShoot", "Searching...");
+                Log.info("CmdAlignShootTeleop", "Searching...");
                 if (limelight.hasValidTarget()) {
                     targetFoundCount += 1;
                 } else {
@@ -122,15 +114,14 @@ public class CmdAlignShootTeleop implements Command {
                 }
 
                 if (targetFoundCount > 5) {
-                    Log.info("CmdAlignShoot", "Target found.");
-                    Log.info("CmdAlignShoot", "Switching to FEEDBACK...");
+                    Log.info("CmdAlignShootTeleop", "Target found.");
+                    Log.info("CmdAlignShootTeleop", "Switching to FEEDBACK...");
                     LimelightData initData = limelight.getValues(Constants.VisionConstants.SAMPLE_RATE);
 
                     SmartDashboard.putNumber("ty", initData.ty());
 
                     currentHorizontalOffset = limelight.getValue(LimelightKey.HORIZONTAL_OFFSET, Constants.VisionConstants.SAMPLE_RATE);//5);
 
-                    previousTime = RobotController.getFPGATime();
                     previousError = goalHorizontalOffset - currentHorizontalOffset;
 
                     cmdRunning.isRunning = true;
@@ -144,8 +135,8 @@ public class CmdAlignShootTeleop implements Command {
                 NarwhalDashboard.put("align_status", "feedback");
                 cmdRunning.isRunning = false;
                 if (!limelight.hasValidTarget()) {
-                    Log.info("CmdAlignShoot", "No valid target.");
-                    Log.info("CmdAlignShoot", "Returning to SEARCHING...");
+                    Log.info("CmdAlignShootTeleop", "No valid target.");
+                    Log.info("CmdAlignShootTeleop", "Returning to SEARCHING...");
 
                     aimState = HorizontalOffsetFeedbackDriveState.SEARCHING;
 
@@ -153,8 +144,6 @@ public class CmdAlignShootTeleop implements Command {
 
                     if (!gotDistance) {
                         LimelightData initData = limelight.getValues(Constants.VisionConstants.SAMPLE_RATE);
-
-                        //shooter.setState(Shooter.ShooterState.MID_RANGE);
 
                         SmartDashboard.putNumber("ty", initData.ty());
 
@@ -164,8 +153,14 @@ public class CmdAlignShootTeleop implements Command {
 
                     currentHorizontalOffset = limelight.getValue(LimelightKey.HORIZONTAL_OFFSET, Constants.VisionConstants.SAMPLE_RATE);
 
-                    currentTime = RobotController.getFPGATime();
                     currentError = goalHorizontalOffset - currentHorizontalOffset;
+
+                    if (txThreshold < Constants.VisionConstants.TX_THRESHOLD_MAX) {
+                        Log.info("CmdAlignShootTeleop", String.valueOf(txThreshold));
+                        //Log.info("CmdAlignShootagain", String.valueOf(currentTime - previousTime));
+                        //Log.info("CmdAlignShootEntire", String.valueOf((currentTime - previousTime) * ((Constants.VisionConstants.TX_THRESHOLD_MAX - Constants.VisionConstants.TX_THRESHOLD)) / Constants.VisionConstants.TIME_TO_MAX_THRESHOLD));
+                        txThreshold += ((currentTime - previousTime) * ((Constants.VisionConstants.TX_THRESHOLD_MAX - Constants.VisionConstants.TX_THRESHOLD)) / Constants.VisionConstants.TIME_TO_MAX_THRESHOLD);
+                    }
 
                     /**
                      * PID feedback loop for the left and right powers based on the horizontal
@@ -185,31 +180,27 @@ public class CmdAlignShootTeleop implements Command {
                     double rightSpeed = rightPower * Constants.DriveConstants.DRIVE_HIGH_SPEED;
                     
                     drive.setWheelPower(new DriveSignal(leftPower, rightPower));
-                    previousTime = currentTime;
                     previousError = currentError;
                 }
-                if ((Math.abs(currentError) < Constants.VisionConstants.TX_THRESHOLD)) {
+                if ((Math.abs(currentError) < (txThreshold * Constants.VisionConstants.TX_THRESHOLD))) {
                     plateauCount++;
                     if (plateauCount > 10) {
-                        shooter.isAligned = true;
+                        stateTracker.setAligned(true);
                         Log.info("Cmd Align Shoot","SHOOTY TIME!!!");
                     }
                 } else {
-                    shooter.isAligned = false;
+                    stateTracker.setAligned(false);
                     plateauCount = 0;
                 }
                 break;
         }
+
+        previousTime = currentTime;
     }
 
     @Override
     public boolean isFinished() {
-        // if (hopper.getBallCount() == 0|| numBallsShot >= numBallsToShoot) {
-        // return true;
-        // } else {
-        // return false;
-        // }
-        return shooter.isAligned;
+        return stateTracker.getAligned();
     }
 
     @Override
@@ -217,9 +208,9 @@ public class CmdAlignShootTeleop implements Command {
         limelight.setLEDMode(LEDMode.OFF);
         drive.stopMovement();
 
-        Log.info("CmdAlignShoot", "Command Finished.");
+        Log.info("CmdAlignShootTeleop", "Command Finished.");
         if (interrupted)
-            Log.info("CmdAlignShoot", "Command interru-");
+            Log.info("CmdAlignShootTeleop", "Command interru-");
         //hopper.setAction(Hopper.ActionState.ORGANIZING);
     }
 }
