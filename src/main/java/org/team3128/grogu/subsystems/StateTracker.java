@@ -1,5 +1,6 @@
 package org.team3128.grogu.subsystems;
 
+import org.team3128.grogu.subsystems.Hopper.HopperState;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class StateTracker implements Subsystem {
@@ -8,7 +9,7 @@ public class StateTracker implements Subsystem {
 
     Shooter shooter;
     Sidekick sidekick;
-    Hopper2 hopper;
+    Hopper hopper;
     Intake intake;
 
     private boolean isAligned = false;
@@ -16,7 +17,7 @@ public class StateTracker implements Subsystem {
     public StateTracker() {
         shooter = Shooter.getInstance();
         sidekick = Sidekick.getInstance();
-        hopper = Hopper2.getInstance();
+        hopper = Hopper.getInstance();
         intake = Intake.getInstance();
     }
 
@@ -28,7 +29,8 @@ public class StateTracker implements Subsystem {
     public void periodic() {
         boolean isShooterReady = shooter.isReady() && sidekick.isReady();
 
-        hopper.setShooting(isShooterReady);
+        if (isShooterReady)
+            hopper.setState(HopperState.SHOOTING);
     }
 
     public void enterShoot() {
@@ -40,6 +42,7 @@ public class StateTracker implements Subsystem {
         intake.stopIntake();
         sidekick.counterShoot();
         shooter.counterShoot();
+        hopper.unshoot = true;
         isAligned = false;
     }
 
