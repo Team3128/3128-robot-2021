@@ -421,6 +421,7 @@ public class MainGrogu extends NarwhalRobot {
         // SmartDashboard.putString("hopper update count", String.valueOf(//hopper.hopper_update_count));
         NarwhalDashboard.put("time", DriverStation.getInstance().getMatchTime());
         NarwhalDashboard.put("voltage", RobotController.getBatteryVoltage());
+        NarwhalDashboard.put("rpm", sidekick.getMeasurement());
 
         currentLeftSpeed = drive.getLeftSpeed();
         currentRightSpeed = drive.getRightSpeed();
