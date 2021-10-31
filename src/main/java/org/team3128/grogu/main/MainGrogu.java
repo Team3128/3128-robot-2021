@@ -149,6 +149,7 @@ public class MainGrogu extends NarwhalRobot {
         shooter.setSetpointAndTolerance(0);
         sidekick.enable();
         sidekick.setState(Sidekick.ShooterState.DEFAULT);
+        stateTracker.register();
 
         shooter.setState(Shooter.ShooterState.MID_RANGE);
         alignCmd = new CmdAlignShootTeleop(shooterLimelight, driveCmdRunning, 0, 26);
@@ -241,7 +242,7 @@ public class MainGrogu extends NarwhalRobot {
         });
 
         listenerLeft.addButtonDownListener("ShootNotAligned", () -> {
-            shooter.isAligned = true; // kind of weird but need it to shoot 
+            stateTracker.setAligned(true); // kind of weird but need it to shoot 
             intake.runIntake();
             sidekick.shoot();
             shooter.shoot();
@@ -253,7 +254,7 @@ public class MainGrogu extends NarwhalRobot {
             shooter.counterShoot();
             // hopper.unshoot = true;
             driveCmdRunning.isRunning = true;
-            shooter.isAligned = false; // make sure we stop lying to the robot
+            stateTracker.setAligned(false); // make sure we stop lying to the robot
         });
 
         // listenerRight.addButtonDownListener("Auto Intake", () -> {
@@ -439,7 +440,9 @@ public class MainGrogu extends NarwhalRobot {
 
         // SmartDashboard.putNumber("Hopper Ball Count", hopper.ballCount);
         // SmartDashboard.putString("Hopper State", hopper.getState().toString());
-        SmartDashboard.putBoolean("Shooter isAligned", shooter.isAligned);
+        SmartDashboard.putBoolean("Shooter isAligned", stateTracker.getAligned());
+        SmartDashboard.putBoolean("Hopper isShooting", hopper.getShooting());
+        SmartDashboard.putBoolean("isShooterReady", stateTracker.isShooterReady);
 
 
     }
@@ -507,7 +510,7 @@ public class MainGrogu extends NarwhalRobot {
         // scheduler.schedule(cmdBallIntake);
 
         scheduler.schedule(autoLessSimple);
-        //scheduler.schedule(autoLessSimple);
+        //scheduler.schedule(autoSimple);
     }
 
 

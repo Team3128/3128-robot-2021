@@ -148,7 +148,7 @@ public class Hopper2 implements Subsystem {
         return !BOTTOM_SENSOR.get();
     }
 
-    private boolean getTop() {
+    public boolean getTop() {
         return !TOP_SENSOR.get();
     }
 

@@ -45,7 +45,7 @@ public class Sidekick extends PIDSubsystem {
     private Sidekick() {
 
         super(new PIDController(Constants.ShooterConstants.SIDEKICK_PID.kP, Constants.ShooterConstants.SIDEKICK_PID.kI, Constants.ShooterConstants.SIDEKICK_PID.kD));
-        getController().setTolerance(2000*Constants.ShooterConstants.RPM_THRESHOLD_PERCENT);
+        getController().setTolerance(2000*Constants.ShooterConstants.RPM_THRESHOLD_PERCENT_SIDEKICK);
         //.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
 
 
@@ -178,8 +178,8 @@ public class Sidekick extends PIDSubsystem {
     public boolean isReady() {
         // if (atSetpoint())
             // Log.info("Sidekick","at Setpoint");
-        return (isPlateaued());
-        //return true;
+        // return (isPlateaued());
+        return true;
     }
 
     public void setPower(double power) {
