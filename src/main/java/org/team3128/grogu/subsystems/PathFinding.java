@@ -1341,10 +1341,10 @@ public class PathFinding {
                                 .addConstraint(autoVoltageConstraint).setReversed(false);
                 
                                 Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-                                        new Pose2d(0, 0, new Rotation2d(-0.404)),
+                                        new Pose2d(0, 0, new Rotation2d(0)),
                                         List.of(
-                                        new Translation2d(52 * inToM, -14 * inToM)),
-                                        new Pose2d(108 * inToM, -15 * inToM, new Rotation2d(0.419)),
+                                        new Translation2d(6 * inToM, 0 /*-14*/ * inToM)),
+                                        new Pose2d(50 * inToM, 0 /*-15*/ * inToM, new Rotation2d(0)),
                                         config);
 
                 // try {

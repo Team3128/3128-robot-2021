@@ -20,7 +20,7 @@ public class Intake implements Subsystem {
 
     private DigitalInput LIMIT_SWITCH_TOP, LIMIT_SWITCH_BOTTOM;
 
-    private IntakeState intakeState; 
+    public IntakeState intakeState; 
 
     public static Intake getInstance() { 
         return instance;
@@ -76,14 +76,22 @@ public class Intake implements Subsystem {
         BRUSH_MOTOR_1.set(ControlMode.PercentOutput, 0);
     }
 
-    public void moveArmDown() {
+    public void moveArmUp() {
         if (intakeState == IntakeState.BOTTOM)
             ARM_MOTOR.set(ControlMode.PercentOutput, -Constants.IntakeConstants.ARM_MOTOR_POWER);
     }
 
-    public void moveArmUp() {
+    public void moveArmDown() {
         if (intakeState == IntakeState.TOP)
             ARM_MOTOR.set(ControlMode.PercentOutput, Constants.IntakeConstants.ARM_MOTOR_POWER);
+    }
+
+    public void moveArm() {
+        if (intakeState == IntakeState.BOTTOM)
+            ARM_MOTOR.set(ControlMode.PercentOutput, -Constants.IntakeConstants.ARM_MOTOR_POWER);
+        else {
+            ARM_MOTOR.set(ControlMode.PercentOutput, Constants.IntakeConstants.ARM_MOTOR_POWER);
+        }
     }
 
     public void moveArmUpAuto() {

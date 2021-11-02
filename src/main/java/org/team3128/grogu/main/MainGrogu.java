@@ -32,6 +32,7 @@ import org.team3128.grogu.subsystems.FalconDrive;
 import org.team3128.grogu.subsystems.Hopper2;
 import org.team3128.grogu.subsystems.Intake;
 import org.team3128.grogu.subsystems.PathFinding;
+import org.team3128.grogu.subsystems.PathRunner;
 import org.team3128.grogu.subsystems.Shooter;
 import org.team3128.grogu.subsystems.Sidekick;
 import org.team3128.grogu.subsystems.StateTracker;
@@ -150,6 +151,7 @@ public class MainGrogu extends NarwhalRobot {
         sidekick.enable();
         sidekick.setState(Sidekick.ShooterState.DEFAULT);
         stateTracker.register();
+        intake.register();
 
         shooter.setState(Shooter.ShooterState.MID_RANGE);
         alignCmd = new CmdAlignShootTeleop(shooterLimelight, driveCmdRunning, 0, 26);
@@ -183,6 +185,7 @@ public class MainGrogu extends NarwhalRobot {
 
         listenerRight.nameControl(new Button(10), "MoveArmDown");
         listenerRight.nameControl(new Button(8), "MoveArmUp");
+        listenerRight.nameControl(new Button(12), "MoveArm");
 
         listenerRight.nameControl(new Button(2), "Shoot");
         listenerLeft.nameControl(new Button(2), "ShootNotAligned");
@@ -195,7 +198,7 @@ public class MainGrogu extends NarwhalRobot {
         listenerRight.nameControl(new Button(9), "SetMiddling");
         listenerRight.nameControl(new Button(11), "SetIntimate");
 
-        listenerRight.nameControl(new Button(12), "ResetBallCount");
+       // listenerRight.nameControl(new Button(12), "ResetBallCount");
 
         
 
@@ -294,8 +297,12 @@ public class MainGrogu extends NarwhalRobot {
             intake.stopArm();
         });
 
-        listenerRight.addButtonDownListener("ResetBallCount", () -> {
-            // hopper.resetBallCount();
+        // listenerRight.addButtonDownListener("ResetBallCount", () -> {
+        //     // hopper.resetBallCount();
+        // });
+
+        listenerRight.addButtonUpListener("MoveArm", () -> {
+            intake.moveArm();
         });
 
         listenerLeft.addButtonDownListener("REVERSE", () -> {
@@ -444,6 +451,10 @@ public class MainGrogu extends NarwhalRobot {
         SmartDashboard.putBoolean("Hopper isShooting", hopper.getShooting());
         SmartDashboard.putBoolean("isShooterReady", stateTracker.isShooterReady);
 
+        SmartDashboard.putString("Intake state", String.valueOf(intake.intakeState));
+        SmartDashboard.putBoolean("Up limit switch", intake.isTopTriggered());
+        SmartDashboard.putBoolean("Down limit switch", intake.isBottomTriggered());
+
 
     }
 
@@ -497,7 +508,7 @@ public class MainGrogu extends NarwhalRobot {
 
 
         // //use this for galactic search
-        // hopper.runIntake();
+        // intake.runIntake();
         // PathFinding pathfinder = new PathFinding();
         // new PathRunner(pathfinder, drive).schedule();
         
@@ -509,8 +520,8 @@ public class MainGrogu extends NarwhalRobot {
         // cmdBallPursuit = new CmdBallPursuit(ahrs, ballLimelight, driveCmdRunning,  0.472441 * Constants.MechanismConstants.inchesToMeters, Constants.VisionConstants.BALL_PID, 0, 2.5*Length.ft, 0.6666666666666666666666 * Length.ft, Constants.VisionConstants.BLIND_BALL_PID,42 * Angle.DEGREES);
         // scheduler.schedule(cmdBallIntake);
 
-        scheduler.schedule(autoLessSimple);
-        //scheduler.schedule(autoSimple);
+        // scheduler.schedule(autoLessSimple);
+        scheduler.schedule(autoSimple);
     }
 
 
