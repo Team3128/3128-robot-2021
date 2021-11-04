@@ -31,6 +31,7 @@ import org.team3128.grogu.subsystems.FalconDrive;
 // import org.team3128.grogu.subsystems.Hopper;
 import org.team3128.grogu.subsystems.Hopper2;
 import org.team3128.grogu.subsystems.Intake;
+import org.team3128.grogu.subsystems.Climber;
 import org.team3128.grogu.subsystems.PathFinding;
 import org.team3128.grogu.subsystems.PathRunner;
 import org.team3128.grogu.subsystems.Shooter;
@@ -91,6 +92,7 @@ public class MainGrogu extends NarwhalRobot {
     public Sidekick sidekick = Sidekick.getInstance();
     public Intake intake = Intake.getInstance();
     public StateTracker stateTracker = StateTracker.getInstance();
+    public Climber climber = Climber.getInstance();
 
     private boolean teleopKinematics = false;
 
@@ -185,7 +187,7 @@ public class MainGrogu extends NarwhalRobot {
 
         listenerRight.nameControl(new Button(10), "MoveArmDown");
         listenerRight.nameControl(new Button(8), "MoveArmUp");
-        listenerRight.nameControl(new Button(12), "MoveArm");
+        // listenerRight.nameControl(new Button(12), "MoveArm");
 
         listenerRight.nameControl(new Button(2), "Shoot");
         listenerLeft.nameControl(new Button(2), "ShootNotAligned");
@@ -212,6 +214,9 @@ public class MainGrogu extends NarwhalRobot {
         listenerLeft.nameControl(new Button(11), "Increment Ball Count");
         listenerLeft.nameControl(new Button(12), "Decrement Ball Count");
 
+        listenerLeft.nameControl(new Button(7), "Climber Move Up");
+        listenerLeft.nameControl(new Button(8), "Climber Move Down");
+
         listenerRight.addMultiListener(() -> {
             if (driveCmdRunning.isRunning) {
                 double horiz = 0.4  * listenerRight.getAxis("MoveTurn"); //-0.5
@@ -223,10 +228,12 @@ public class MainGrogu extends NarwhalRobot {
         }, "MoveTurn", "MoveForwards", "Throttle");
 
         listenerRight.addButtonDownListener("Intake", () -> {
+            intake.moveArmDown();
             intake.runIntake();
         });
 
         listenerRight.addButtonUpListener("Intake", () -> {
+            intake.moveArmUp();
             intake.stopIntake();
         });
 
@@ -301,9 +308,9 @@ public class MainGrogu extends NarwhalRobot {
         //     // hopper.resetBallCount();
         // });
 
-        listenerRight.addButtonUpListener("MoveArm", () -> {
-            intake.moveArm();
-        });
+        // listenerRight.addButtonUpListener("MoveArm", () -> {
+        //     // intake.moveArm();
+        // });
 
         listenerLeft.addButtonDownListener("REVERSE", () -> {
             reverse *= -1;
@@ -348,6 +355,24 @@ public class MainGrogu extends NarwhalRobot {
 
         listenerLeft.addButtonDownListener("Decrement Ball Count", () -> {
             // hopper.ballCount--;
+        });
+
+
+
+        listenerLeft.addButtonDownListener("Climber Move Up", () -> {
+            climber.moveClimberUp();
+        });
+
+        listenerLeft.addButtonUpListener("Climber Move Up", () -> {
+            climber.stopClimber();
+        });
+
+        listenerLeft.addButtonDownListener("Climber Move Down", () -> {
+            climber.moveClimberDown();
+        });
+
+        listenerLeft.addButtonUpListener("Climber Move Down", () -> {
+            climber.stopClimber();
         });
 
     }
@@ -486,7 +511,7 @@ public class MainGrogu extends NarwhalRobot {
     protected void autonomousInit() {
         Log.info("MainGrogu", "moving arm down");
         // hopper.moveArmDown();
-        intake.moveArmUpAuto();
+        // intake.moveArmUpAuto();
 
        // hopper.stopHopper();
         drive.resetGyro();

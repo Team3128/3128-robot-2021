@@ -57,7 +57,7 @@ public class Constants extends RobotConstants {
                                 * Constants.DriveConstants.WHEEL_DIAMETER * Math.PI
                                 * Constants.DriveConstants.WHEEL_ROTATIONS_FOR_ONE_ENCODER_ROTATION;
 
-                public static final NeutralMode DRIVE_IDLE_MODE = NeutralMode.Brake;
+                public static final NeutralMode DRIVE_IDLE_MODE = NeutralMode.Coast;
 
                 public static final double ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION = 64 / 8; // basically your gearing. Ask Mech for rpm ratio: 8
 
@@ -194,10 +194,20 @@ public class Constants extends RobotConstants {
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
 
                 public static final double INTAKE_MOTOR_POWER = 0.6;
-                public static final double BRUSH_MOTOR_POWER = 0.3;
-                public static final double ARM_MOTOR_POWER = 0.2;
+                public static final double BRUSH_MOTOR_POWER = 0.28;
+                public static final double ARM_MOTOR_POWER = 0.28;
 
                 public static final double ARM_MOTOR_POWER_AUTO = 0.07;
+        }
+
+
+        public static class ClimberConstants {
+                public static final int CLIMBER_MOTOR_1_ID = 10;
+                public static final int CLIMBER_MOTOR_2_ID = 11;
+                // Set Powers (might do encoders tho so might be unnecessary)
+                public static final double CLIMBER_MOTOR_POWER = 1;
+
+                public static final NeutralMode CLIMBER_NEUTRAL_MODE = NeutralMode.Brake;
         }
 
 }

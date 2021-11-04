@@ -30,7 +30,7 @@ public class Intake implements Subsystem {
         configMotors();
         configSensors();
 
-        intakeState = IntakeState.BOTTOM;
+        intakeState = IntakeState.TOP;
     }
 
     private void configMotors() {
