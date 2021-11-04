@@ -4,38 +4,27 @@ package org.team3128.grogu.subsystems;
  * @author Tyler Costello and Autonomous Pod
  */
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
 
-
-import static edu.wpi.first.wpilibj.XboxController.Button;
 import org.team3128.common.utility.Log;
-import org.team3128.common.utility.units.Length;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
-import org.team3128.sim.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import java.util.List;
-import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
-import java.nio.file.*;
-import java.io.*;
-
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class PathFinding {
@@ -1352,10 +1341,10 @@ public class PathFinding {
                                 .addConstraint(autoVoltageConstraint).setReversed(false);
                 
                                 Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-                                        new Pose2d(0, 0, new Rotation2d(-0.404)),
+                                        new Pose2d(0, 0, new Rotation2d(0)),
                                         List.of(
-                                        new Translation2d(52 * inToM, -14 * inToM)),
-                                        new Pose2d(108 * inToM, -15 * inToM, new Rotation2d(0.419)),
+                                        new Translation2d(6 * inToM, 0 /*-14*/ * inToM)),
+                                        new Pose2d(50 * inToM, 0 /*-15*/ * inToM, new Rotation2d(0)),
                                         config);
 
                 // try {
