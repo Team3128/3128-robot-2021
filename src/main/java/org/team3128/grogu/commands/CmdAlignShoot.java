@@ -15,7 +15,7 @@ import org.team3128.common.utility.RobotMath;
 import org.team3128.common.utility.datatypes.PIDConstants;
 import org.team3128.grogu.subsystems.Constants;
 import org.team3128.grogu.subsystems.FalconDrive;
-import org.team3128.grogu.subsystems.Hopper;
+import org.team3128.grogu.subsystems.Hopper2;
 import org.team3128.grogu.subsystems.Intake;
 import org.team3128.grogu.subsystems.StateTracker;
 
@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 
 public class CmdAlignShoot implements Command {
     FalconDrive drive;
-    Hopper hopper;
+    Hopper2 hopper;
     StateTracker stateTracker;
 
     boolean gotDistance = false;
@@ -76,7 +76,7 @@ public class CmdAlignShoot implements Command {
     private HorizontalOffsetFeedbackDriveState aimState = HorizontalOffsetFeedbackDriveState.SEARCHING;
 
     public CmdAlignShoot(Limelight limelight, DriveCommandRunning cmdRunning, double goalHorizontalOffset, int numBallsToShoot) {
-        this.hopper = Hopper.getInstance();
+        this.hopper = Hopper2.getInstance();
         this.drive = FalconDrive.getInstance();
         this.stateTracker = StateTracker.getInstance();
 
@@ -111,7 +111,7 @@ public class CmdAlignShoot implements Command {
         stateTracker.enterShoot();
 
         Log.info("CmdAlignShoot", "initialized limelight, aren't I cool!");
-        hopper.ballCount = 3;
+        //hopper.ballCount = 3;
         initialTime = RobotController.getFPGATime() / 1e6;
     }
 

@@ -9,7 +9,7 @@ public class StateTracker implements Subsystem {
 
     Shooter shooter;
     Sidekick sidekick;
-    Hopper hopper;
+    Hopper2 hopper;
     Intake intake;
     public boolean isShooterReady;
 
@@ -18,7 +18,7 @@ public class StateTracker implements Subsystem {
     public StateTracker() {
         shooter = Shooter.getInstance();
         sidekick = Sidekick.getInstance();
-        hopper = Hopper.getInstance();
+        hopper = Hopper2.getInstance();
         intake = Intake.getInstance();
     }
 
@@ -43,7 +43,6 @@ public class StateTracker implements Subsystem {
         intake.stopIntake();
         sidekick.counterShoot();
         shooter.counterShoot();
-        hopper.unshoot = true;
         isAligned = false;
     }
 
