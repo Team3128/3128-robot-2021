@@ -16,11 +16,11 @@ public class Intake implements Subsystem {
 
     public static final Intake instance = new Intake();
     private LazyTalonSRX ARM_MOTOR;
-    private LazyVictorSPX BRUSH_MOTOR, INTAKE_MOTOR;
+    private LazyVictorSPX BRUSH_MOTOR_1, BRUSH_MOTOR_2, INTAKE_MOTOR;
 
     private DigitalInput LIMIT_SWITCH_TOP, LIMIT_SWITCH_BOTTOM;
 
-    private IntakeState intakeState; 
+    public IntakeState intakeState; 
 
     public static Intake getInstance() { 
         return instance;
@@ -30,15 +30,17 @@ public class Intake implements Subsystem {
         configMotors();
         configSensors();
 
-        intakeState = IntakeState.BOTTOM;
+        intakeState = IntakeState.TOP;
     }
 
     private void configMotors() {
         ARM_MOTOR = new LazyTalonSRX(Constants.IntakeConstants.ARM_MOTOR_ID);
-        BRUSH_MOTOR = new LazyVictorSPX(Constants.IntakeConstants.BRUSH_MOTOR_ID);
+        BRUSH_MOTOR_1 = new LazyVictorSPX(Constants.IntakeConstants.BRUSH_MOTOR_1_ID);
+        BRUSH_MOTOR_2 = new LazyVictorSPX(Constants.IntakeConstants.BRUSH_MOTOR_2_ID);
         INTAKE_MOTOR = new LazyVictorSPX(Constants.IntakeConstants.INTAKE_MOTOR_ID);
 
         ARM_MOTOR.setNeutralMode(Constants.IntakeConstants.ARM_NEUTRAL_MODE);
+        BRUSH_MOTOR_2.set(ControlMode.Follower, Constants.IntakeConstants.BRUSH_MOTOR_1_ID);
 
     }
     
@@ -61,27 +63,35 @@ public class Intake implements Subsystem {
 
     public void runIntake() {
         INTAKE_MOTOR.set(ControlMode.PercentOutput, Constants.IntakeConstants.INTAKE_MOTOR_POWER);
-        BRUSH_MOTOR.set(ControlMode.PercentOutput, -Constants.IntakeConstants.BRUSH_MOTOR_POWER);
+        BRUSH_MOTOR_1.set(ControlMode.PercentOutput, -Constants.IntakeConstants.BRUSH_MOTOR_POWER);
     }
 
     public void runIntakeOpp() {
         //INTAKE_MOTOR.set(ControlMode.PercentOutput, Constants.IntakeConstants.INTAKE_MOTOR_POWER);
-        BRUSH_MOTOR.set(ControlMode.PercentOutput, Constants.IntakeConstants.BRUSH_MOTOR_POWER);
+        BRUSH_MOTOR_1.set(ControlMode.PercentOutput, Constants.IntakeConstants.BRUSH_MOTOR_POWER);
     }
 
     public void stopIntake() {
         INTAKE_MOTOR.set(ControlMode.PercentOutput, 0);
-        BRUSH_MOTOR.set(ControlMode.PercentOutput, 0);
+        BRUSH_MOTOR_1.set(ControlMode.PercentOutput, 0);
     }
 
-    public void moveArmDown() {
+    public void moveArmUp() {
         if (intakeState == IntakeState.BOTTOM)
             ARM_MOTOR.set(ControlMode.PercentOutput, -Constants.IntakeConstants.ARM_MOTOR_POWER);
     }
 
-    public void moveArmUp() {
+    public void moveArmDown() {
         if (intakeState == IntakeState.TOP)
             ARM_MOTOR.set(ControlMode.PercentOutput, Constants.IntakeConstants.ARM_MOTOR_POWER);
+    }
+
+    public void moveArm() {
+        if (intakeState == IntakeState.BOTTOM)
+            ARM_MOTOR.set(ControlMode.PercentOutput, -Constants.IntakeConstants.ARM_MOTOR_POWER);
+        else {
+            ARM_MOTOR.set(ControlMode.PercentOutput, Constants.IntakeConstants.ARM_MOTOR_POWER);
+        }
     }
 
     public void moveArmUpAuto() {

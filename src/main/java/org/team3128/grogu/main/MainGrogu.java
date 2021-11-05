@@ -30,7 +30,9 @@ import org.team3128.grogu.subsystems.EKF;
 import org.team3128.grogu.subsystems.FalconDrive;
 import org.team3128.grogu.subsystems.Hopper;
 import org.team3128.grogu.subsystems.Intake;
+import org.team3128.grogu.subsystems.Climber;
 import org.team3128.grogu.subsystems.PathFinding;
+import org.team3128.grogu.subsystems.PathRunner;
 import org.team3128.grogu.subsystems.Shooter;
 import org.team3128.grogu.subsystems.Sidekick;
 import org.team3128.grogu.subsystems.StateTracker;
@@ -89,6 +91,7 @@ public class MainGrogu extends NarwhalRobot {
     public Sidekick sidekick = Sidekick.getInstance();
     public Intake intake = Intake.getInstance();
     public StateTracker stateTracker = StateTracker.getInstance();
+    public Climber climber = Climber.getInstance();
 
     private boolean teleopKinematics = false;
 
@@ -148,6 +151,8 @@ public class MainGrogu extends NarwhalRobot {
         shooter.setSetpointAndTolerance(0);
         sidekick.enable();
         sidekick.setState(Sidekick.ShooterState.DEFAULT);
+        stateTracker.register();
+        intake.register();
 
         shooter.setState(Shooter.ShooterState.MID_RANGE);
         alignCmd = new CmdAlignShootTeleop(shooterLimelight, driveCmdRunning, 0, 26);
@@ -181,6 +186,7 @@ public class MainGrogu extends NarwhalRobot {
 
         listenerRight.nameControl(new Button(10), "MoveArmDown");
         listenerRight.nameControl(new Button(8), "MoveArmUp");
+        // listenerRight.nameControl(new Button(12), "MoveArm");
 
         listenerRight.nameControl(new Button(2), "Shoot");
         listenerLeft.nameControl(new Button(2), "ShootNotAligned");
@@ -193,7 +199,7 @@ public class MainGrogu extends NarwhalRobot {
         listenerRight.nameControl(new Button(9), "SetMiddling");
         listenerRight.nameControl(new Button(11), "SetIntimate");
 
-        listenerRight.nameControl(new Button(12), "ResetBallCount");
+       // listenerRight.nameControl(new Button(12), "ResetBallCount");
 
         
 
@@ -207,6 +213,9 @@ public class MainGrogu extends NarwhalRobot {
         listenerLeft.nameControl(new Button(11), "Increment Ball Count");
         listenerLeft.nameControl(new Button(12), "Decrement Ball Count");
 
+        listenerLeft.nameControl(new Button(7), "Climber Move Up");
+        listenerLeft.nameControl(new Button(8), "Climber Move Down");
+
         listenerRight.addMultiListener(() -> {
             if (driveCmdRunning.isRunning) {
                 double horiz = 0.4  * listenerRight.getAxis("MoveTurn"); //-0.5
@@ -218,11 +227,13 @@ public class MainGrogu extends NarwhalRobot {
         }, "MoveTurn", "MoveForwards", "Throttle");
 
         listenerRight.addButtonDownListener("Intake", () -> {
-            hopper.runIntake();
+            intake.moveArmDown();
+            intake.runIntake();
         });
 
         listenerRight.addButtonUpListener("Intake", () -> {
-            hopper.stopIntake();
+            intake.moveArmUp();
+            intake.stopIntake();
         });
 
         listenerRight.addButtonDownListener("Shoot", () -> {
@@ -240,8 +251,8 @@ public class MainGrogu extends NarwhalRobot {
         });
 
         listenerLeft.addButtonDownListener("ShootNotAligned", () -> {
-            shooter.isAligned = true; // kind of weird but need it to shoot 
-            hopper.runIntake();
+            stateTracker.setAligned(true); // kind of weird but need it to shoot 
+            intake.runIntake();
             sidekick.shoot();
             shooter.shoot();
         });
@@ -252,7 +263,7 @@ public class MainGrogu extends NarwhalRobot {
             shooter.counterShoot();
             hopper.unshoot = true;
             driveCmdRunning.isRunning = true;
-            shooter.isAligned = false; // make sure we stop lying to the robot
+            stateTracker.setAligned(false); // make sure we stop lying to the robot
         });
 
         // listenerRight.addButtonDownListener("Auto Intake", () -> {
@@ -292,9 +303,13 @@ public class MainGrogu extends NarwhalRobot {
             intake.stopArm();
         });
 
-        listenerRight.addButtonDownListener("ResetBallCount", () -> {
-            hopper.resetBallCount();
-        });
+        // listenerRight.addButtonDownListener("ResetBallCount", () -> {
+        //     // hopper.resetBallCount();
+        // });
+
+        // listenerRight.addButtonUpListener("MoveArm", () -> {
+        //     // intake.moveArm();
+        // });
 
         listenerLeft.addButtonDownListener("REVERSE", () -> {
             reverse *= -1;
@@ -339,6 +354,24 @@ public class MainGrogu extends NarwhalRobot {
 
         listenerLeft.addButtonDownListener("Decrement Ball Count", () -> {
             hopper.ballCount--;
+        });
+
+
+
+        listenerLeft.addButtonDownListener("Climber Move Up", () -> {
+            climber.moveClimberUp();
+        });
+
+        listenerLeft.addButtonUpListener("Climber Move Up", () -> {
+            climber.stopClimber();
+        });
+
+        listenerLeft.addButtonDownListener("Climber Move Down", () -> {
+            climber.moveClimberDown();
+        });
+
+        listenerLeft.addButtonUpListener("Climber Move Down", () -> {
+            climber.stopClimber();
         });
 
     }
@@ -436,9 +469,15 @@ public class MainGrogu extends NarwhalRobot {
         SmartDashboard.putString("Shooter isReady", String.valueOf(shooter.isReady()));
         SmartDashboard.putString("Sidekick isReady", String.valueOf(sidekick.isReady()));
 
-        SmartDashboard.putNumber("Hopper Ball Count", hopper.ballCount);
-        SmartDashboard.putString("Hopper State", hopper.getState().toString());
-        SmartDashboard.putBoolean("Shooter isAligned", shooter.isAligned);
+        // SmartDashboard.putNumber("Hopper Ball Count", hopper.ballCount);
+        // SmartDashboard.putString("Hopper State", hopper.getState().toString());
+        SmartDashboard.putBoolean("Shooter isAligned", stateTracker.getAligned());
+        SmartDashboard.putBoolean("Hopper isShooting", hopper.getShooting());
+        SmartDashboard.putBoolean("isShooterReady", stateTracker.isShooterReady);
+
+        SmartDashboard.putString("Intake state", String.valueOf(intake.intakeState));
+        SmartDashboard.putBoolean("Up limit switch", intake.isTopTriggered());
+        SmartDashboard.putBoolean("Down limit switch", intake.isBottomTriggered());
 
 
     }
@@ -471,7 +510,7 @@ public class MainGrogu extends NarwhalRobot {
     protected void autonomousInit() {
         Log.info("MainGrogu", "moving arm down");
         // hopper.moveArmDown();
-        hopper.moveArmUpAuto();
+        // intake.moveArmUpAuto();
 
        // hopper.stopHopper();
         drive.resetGyro();
@@ -493,7 +532,7 @@ public class MainGrogu extends NarwhalRobot {
 
 
         // //use this for galactic search
-        // hopper.runIntake();
+        // intake.runIntake();
         // PathFinding pathfinder = new PathFinding();
         // new PathRunner(pathfinder, drive).schedule();
         
@@ -505,8 +544,8 @@ public class MainGrogu extends NarwhalRobot {
         // cmdBallPursuit = new CmdBallPursuit(ahrs, ballLimelight, driveCmdRunning,  0.472441 * Constants.MechanismConstants.inchesToMeters, Constants.VisionConstants.BALL_PID, 0, 2.5*Length.ft, 0.6666666666666666666666 * Length.ft, Constants.VisionConstants.BLIND_BALL_PID,42 * Angle.DEGREES);
         // scheduler.schedule(cmdBallIntake);
 
-        scheduler.schedule(autoLessSimple);
-        //scheduler.schedule(autoLessSimple);
+        // scheduler.schedule(autoLessSimple);
+        scheduler.schedule(autoSimple);
     }
 
 

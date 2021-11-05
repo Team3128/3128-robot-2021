@@ -1,7 +1,7 @@
 package org.team3128.grogu.subsystems;
-
-import org.team3128.grogu.subsystems.Hopper.HopperState;
+import org.team3128.common.utility.Log;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class StateTracker implements Subsystem {
 
@@ -11,6 +11,7 @@ public class StateTracker implements Subsystem {
     Sidekick sidekick;
     Hopper hopper;
     Intake intake;
+    public boolean isShooterReady;
 
     private boolean isAligned = false;
 
@@ -27,10 +28,10 @@ public class StateTracker implements Subsystem {
 
     @Override
     public void periodic() {
-        boolean isShooterReady = shooter.isReady() && sidekick.isReady();
-
-        if (isShooterReady)
-            hopper.setState(HopperState.SHOOTING);
+        isShooterReady = shooter.isReady() && sidekick.isReady() && isAligned;
+        Log.info("StateTracker", "shooter.isReady(): " + shooter.isReady());
+        Log.info("StateTracker", "sidekick.isReady(): " + sidekick.isReady());
+        hopper.setShooting(isShooterReady);
     }
 
     public void enterShoot() {

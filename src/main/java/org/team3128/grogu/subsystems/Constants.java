@@ -57,7 +57,7 @@ public class Constants extends RobotConstants {
                                 * Constants.DriveConstants.WHEEL_DIAMETER * Math.PI
                                 * Constants.DriveConstants.WHEEL_ROTATIONS_FOR_ONE_ENCODER_ROTATION;
 
-                public static final NeutralMode DRIVE_IDLE_MODE = NeutralMode.Brake;
+                public static final NeutralMode DRIVE_IDLE_MODE = NeutralMode.Coast;
 
                 public static final double ENCODER_ROTATIONS_FOR_ONE_WHEEL_ROTATION = 64 / 8; // basically your gearing. Ask Mech for rpm ratio: 8
 
@@ -156,11 +156,12 @@ public class Constants extends RobotConstants {
                 // new 2
                 public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 16e-6, 5e-6, 4.20e-6);
                 
-                public static final PIDConstants SIDEKICK_PID = new PIDConstants(0, 1e-6, 0, 0);
+                public static final PIDConstants SIDEKICK_PID = new PIDConstants(0, 0, 0, 0);
 
                 public static final double SHOOTER_SATURATION_LIMIT = 5; // set limit on integral accumulation (in this case, 1 volt)
                 // public static final double RPM_THRESHOLD = 200; // the maximum difference between an RPM and  the setpoint for a data point to be considered as a plataeu
                 public static final double RPM_THRESHOLD_PERCENT = 0.05;
+                public static final double RPM_THRESHOLD_PERCENT_SIDEKICK = 0.075;
                 // public static final double RPM_PLATEAU_THRESHOLD = 100; // the maximum difference between an RPM and  the setpoint for a data point to be considered as a plataeu
                 public static final double RPM_PLATEAU_PERCENT = 0.02;
                 public static final int PLATEAU_COUNT = 25; // 50 * 0.005s = 0.25 seconds of plateau required
@@ -177,13 +178,14 @@ public class Constants extends RobotConstants {
                 public static final int BOTTOM_SENSOR_ID = 9;
                 public static final int TOP_SENSOR_ID = 8;
 
-                public static final double HOPPER_MOTOR_POWER = -0.4;
-                public static final double HOPPER_MOTOR_2_POWER = 0.08;
+                public static final double HOPPER_MOTOR_POWER = -0.5;
+                public static final double HOPPER_MOTOR_2_POWER = -0.3;
         }
 
         public static class IntakeConstants {
                 public static final int ARM_MOTOR_ID = 7;
-                public static final int BRUSH_MOTOR_ID = 5;
+                public static final int BRUSH_MOTOR_1_ID = 5;
+                public static final int BRUSH_MOTOR_2_ID = 33;
                 public static final int INTAKE_MOTOR_ID = 4;
 
                 public static final int TOP_LIMIT_SWITCH_ID = 0;
@@ -191,11 +193,21 @@ public class Constants extends RobotConstants {
 
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
 
-                public static final double INTAKE_MOTOR_POWER = -0.6;
-                public static final double BRUSH_MOTOR_POWER = 0.3;
-                public static final double ARM_MOTOR_POWER = 0.2;
+                public static final double INTAKE_MOTOR_POWER = 0.6;
+                public static final double BRUSH_MOTOR_POWER = 0.28;
+                public static final double ARM_MOTOR_POWER = 0.28;
 
                 public static final double ARM_MOTOR_POWER_AUTO = 0.07;
+        }
+
+
+        public static class ClimberConstants {
+                public static final int CLIMBER_MOTOR_1_ID = 10;
+                public static final int CLIMBER_MOTOR_2_ID = 11;
+                // Set Powers (might do encoders tho so might be unnecessary)
+                public static final double CLIMBER_MOTOR_POWER = 1;
+
+                public static final NeutralMode CLIMBER_NEUTRAL_MODE = NeutralMode.Brake;
         }
 
 }

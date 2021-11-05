@@ -45,7 +45,7 @@ public class Sidekick extends PIDSubsystem {
     private Sidekick() {
 
         super(new PIDController(Constants.ShooterConstants.SIDEKICK_PID.kP, Constants.ShooterConstants.SIDEKICK_PID.kI, Constants.ShooterConstants.SIDEKICK_PID.kD));
-        getController().setTolerance(2000*Constants.ShooterConstants.RPM_THRESHOLD_PERCENT);
+        getController().setTolerance(2000*Constants.ShooterConstants.RPM_THRESHOLD_PERCENT_SIDEKICK);
         //.setDistancePerPulse(ShooterConstants.kEncoderDistancePerPulse);
 
 
@@ -109,7 +109,7 @@ public class Sidekick extends PIDSubsystem {
 
         prevError = error;
 
-        if ((Math.abs(value - preValue) <= Constants.ShooterConstants.RPM_PLATEAU_PERCENT * -setpoint) && /*(Math.abs(value - setpoint) <= Constants.ShooterConstants.RPM_THRESHOLD_PERCENT * setpoint) && */(setpoint != 0)) {
+        if (((Math.abs(value - preValue)) <= Constants.ShooterConstants.RPM_PLATEAU_PERCENT * -setpoint) && /*(Math.abs(value - setpoint) <= Constants.ShooterConstants.RPM_THRESHOLD_PERCENT * setpoint) &&*/ (setpoint != 0)) {
             plateauCount++;
         } else {
             plateauCount = 0;
@@ -155,7 +155,7 @@ public class Sidekick extends PIDSubsystem {
 
     public double shooterFeedForward(double desiredSetpoint) {
         //double ff = (0.00211 * desiredSetpoint) - 2; // 0.051
-        double ff = (0.0024 * desiredSetpoint); //0.3//0.00147x - 0.2; // 0
+        double ff = (0.0027 * desiredSetpoint); //0.3//0.00147x - 0.2; // 0
         if (getSetpoint() != 0) {
             return ff;
         } else {
@@ -179,7 +179,7 @@ public class Sidekick extends PIDSubsystem {
         // if (atSetpoint())
             // Log.info("Sidekick","at Setpoint");
         return (isPlateaued());
-        //return true;
+        // return true;
     }
 
     public void setPower(double power) {

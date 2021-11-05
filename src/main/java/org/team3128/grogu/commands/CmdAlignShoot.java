@@ -63,6 +63,10 @@ public class CmdAlignShoot implements Command {
     int numBallsShot;
     int numBallsToShoot;
 
+    public int ballCount;
+    boolean wasTriggeredTop;
+
+
     private double txThreshold = Constants.VisionConstants.TX_THRESHOLD;
 
     private enum HorizontalOffsetFeedbackDriveState {
@@ -88,6 +92,8 @@ public class CmdAlignShoot implements Command {
         this.goalHorizontalOffset = goalHorizontalOffset;
 
         this.numBallsToShoot = numBallsToShoot;
+
+        ballCount = 3;
         
     }
 
@@ -109,10 +115,18 @@ public class CmdAlignShoot implements Command {
         initialTime = RobotController.getFPGATime() / 1e6;
     }
 
+
+    
+
     @Override
     public void execute() {
         //Log.info("CmdAlignShoot", "Running one loop of execute");
         currentTime = RobotController.getFPGATime() / 1e6;
+
+        if (wasTriggeredTop && !hopper.getTop()) {
+            ballCount--;
+        }
+
 
         switch (aimState) {
             case SEARCHING:
@@ -204,6 +218,7 @@ public class CmdAlignShoot implements Command {
                 break;
         }
 
+        wasTriggeredTop = hopper.getTop();
         previousTime = currentTime;
     }
 
@@ -214,7 +229,8 @@ public class CmdAlignShoot implements Command {
         // } else {
         // return false;
         // }
-        return (stateTracker.getAligned() && hopper.getBallCount() == 0) || (currentTime - initialTime > Constants.VisionConstants.AUTO_ALIGN_TIMEOUT);
+
+        return (stateTracker.getAligned() && ballCount == 0) || (currentTime - initialTime > Constants.VisionConstants.AUTO_ALIGN_TIMEOUT);
     }
 
     @Override
