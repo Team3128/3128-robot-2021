@@ -184,7 +184,7 @@ public class MainGrogu extends NarwhalRobot {
         listenerRight.nameControl(ControllerExtreme3D.THROTTLE, "Throttle");
         listenerRight.nameControl(ControllerExtreme3D.TRIGGER, "Intake");
 
-        listenerRight.nameControl(new Button(10), "MoveArmDown");
+        listenerRight.nameControl(new Button(7), "MoveArmDown");
         listenerRight.nameControl(new Button(8), "MoveArmUp");
         // listenerRight.nameControl(new Button(12), "MoveArm");
 
@@ -195,9 +195,9 @@ public class MainGrogu extends NarwhalRobot {
 
         listenerRight.nameControl(new Button(3), "EmptyHopper");
 
-        listenerRight.nameControl(new Button(7), "SetOverYonder");
-        listenerRight.nameControl(new Button(9), "SetMiddling");
-        listenerRight.nameControl(new Button(11), "SetIntimate");
+        // listenerRight.nameControl(new Button(7), "SetOverYonder");
+        // listenerRight.nameControl(new Button(9), "SetMiddling");
+        // listenerRight.nameControl(new Button(11), "SetIntimate");
 
        // listenerRight.nameControl(new Button(12), "ResetBallCount");
 
@@ -227,12 +227,12 @@ public class MainGrogu extends NarwhalRobot {
         }, "MoveTurn", "MoveForwards", "Throttle");
 
         listenerRight.addButtonDownListener("Intake", () -> {
-            intake.moveArmDown();
+            //intake.moveArmDown();
             intake.runIntake();
         });
 
         listenerRight.addButtonUpListener("Intake", () -> {
-            intake.moveArmUp();
+            //intake.moveArmUp();
             intake.stopIntake();
         });
 
@@ -324,15 +324,15 @@ public class MainGrogu extends NarwhalRobot {
             hopper.stopHopper();
          });
          */
-        listenerRight.addButtonDownListener("SetOverYonder", () -> {
-            shooter.setState(Shooter.ShooterState.LONG_RANGE);
-        });
-        listenerRight.addButtonDownListener("SetMiddling", () -> {
-            shooter.setState(Shooter.ShooterState.MID_RANGE);
-        });
-        listenerRight.addButtonDownListener("SetIntimate", () -> {
-            shooter.setState(Shooter.ShooterState.SHORT_RANGE);
-        });
+        // listenerRight.addButtonDownListener("SetOverYonder", () -> {
+        //     shooter.setState(Shooter.ShooterState.LONG_RANGE);
+        // });
+        // listenerRight.addButtonDownListener("SetMiddling", () -> {
+        //     shooter.setState(Shooter.ShooterState.MID_RANGE);
+        // });
+        // listenerRight.addButtonDownListener("SetIntimate", () -> {
+        //     shooter.setState(Shooter.ShooterState.SHORT_RANGE);
+        // });
 
         // listenerLeft.addButtonDownListener("SetGreen", () -> {
         //     shooter.setState(Shooter.ShooterState.GREEN);

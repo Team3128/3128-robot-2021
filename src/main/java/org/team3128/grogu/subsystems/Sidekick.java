@@ -178,8 +178,8 @@ public class Sidekick extends PIDSubsystem {
     public boolean isReady() {
         // if (atSetpoint())
             // Log.info("Sidekick","at Setpoint");
-        return (isPlateaued());
-        // return true;
+        //return (isPlateaued());
+        return true;
     }
 
     public void setPower(double power) {
