@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.PIDSubsystem;
 public class Shooter extends PIDSubsystem {
     public enum ShooterState {
         OFF(0),
-        LONG_RANGE(5500), // long range shooting
+        LONG_RANGE(6000), // long range shooting
         MID_RANGE(4800), //4800 actual setpoint  // mid range shooting
         SHORT_RANGE(3500),
         GREEN(1200),
@@ -111,7 +111,7 @@ public class Shooter extends PIDSubsystem {
         
         double accel = (value - preValue) / (time - preTime);
 
-        // Log.info("Shooter",getMeasurement()+" RPM");
+        Log.info("Shooter",getMeasurement()+" RPM");
 
         if (atSetpoint() && (setpoint != 0)) {
             plateauCount++;
@@ -190,6 +190,7 @@ public class Shooter extends PIDSubsystem {
         //double ff = (0.00211 * desiredSetpoint) - 2; // 0.051
         // feed forward: 0.0019
         double ff = ((0.0019) * desiredSetpoint);//0.00168//0.00170 // 0.00188*x //0.00147x - 0.2; // 0
+        //Log.info("shooter","feedForward: " + ff);
         if (getSetpoint() != 0) {
             return ff;
         } else {

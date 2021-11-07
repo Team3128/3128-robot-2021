@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj2.command.*;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class AutoSimple extends SequentialCommandGroup {
+public class AutoSimpleForward extends SequentialCommandGroup {
 
-    public AutoSimple(Limelight shooterLimelight, DriveCommandRunning cmdRunning, double goalHorizontalOffset, PathFinding m_robotContainer, FalconDrive mRobotDrive, Intake intake) {       
+    public AutoSimpleForward(Limelight shooterLimelight, DriveCommandRunning cmdRunning, double goalHorizontalOffset, PathFinding m_robotContainer, FalconDrive mRobotDrive, Intake intake) {       
         addCommands(
             new CmdAlignShoot(shooterLimelight, cmdRunning, goalHorizontalOffset, 3),
             new InstantCommand(() -> intake.runIntake()),
-            m_robotContainer.getAutonomousCommandSimple(mRobotDrive),
+            m_robotContainer.getAutonomousCommandSimpleForward(mRobotDrive),
             new InstantCommand(() -> intake.stopIntake())
             );
     }

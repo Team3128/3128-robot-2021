@@ -120,7 +120,7 @@ public class Constants extends RobotConstants {
                 public static final PIDConstants VISION_PID = new PIDConstants(0, 0.01, 0.02, 0.00006);
                 public static final PIDConstants BALL_PID = new PIDConstants(0.57, 0.02, 0.0, 0.00003);
                 public static final PIDConstants BLIND_BALL_PID = new PIDConstants(0.23, 0, 0, 0);
-                public static final double AUTO_ALIGN_TIMEOUT = 10; // seconds to wait before canceling 
+                public static final double AUTO_ALIGN_TIMEOUT = 6; // seconds to wait before canceling 
         }
 
 
@@ -154,7 +154,7 @@ public class Constants extends RobotConstants {
                 // public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 0.0457/5, 0, 4.20e-5);
 
                 // new 2
-                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 16e-6, 5e-6, 4.20e-6);
+                public static final PIDConstants SHOOTER_PID = new PIDConstants(0, 16e-6, 5e-6, 4.20e-6); //0, 16e-6, 5e-6, 4.20e-6
                 
                 public static final PIDConstants SIDEKICK_PID = new PIDConstants(0, 0, 0, 0);
 
@@ -194,7 +194,7 @@ public class Constants extends RobotConstants {
                 public static final NeutralMode ARM_NEUTRAL_MODE = NeutralMode.Brake;
 
                 public static final double INTAKE_MOTOR_POWER = 0.6;
-                public static final double BRUSH_MOTOR_POWER = 0.28;
+                public static final double BRUSH_MOTOR_POWER = 0.78;
                 public static final double ARM_MOTOR_POWER = 0.28;
 
                 public static final double ARM_MOTOR_POWER_AUTO = 0.07;

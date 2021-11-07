@@ -54,10 +54,10 @@ public class Intake implements Subsystem {
     public void periodic() {
         if (isBottomTriggered() && intakeState == IntakeState.TOP) {
             intakeState = IntakeState.BOTTOM;
-            stopArm();
+            //stopArm();
         } else if (isTopTriggered() && intakeState == IntakeState.BOTTOM) {
             intakeState = IntakeState.TOP;
-            stopArm();
+            //stopArm();
         }
     }
 
